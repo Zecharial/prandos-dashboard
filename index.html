@@ -259,6 +259,95 @@
   }
   .chip.mini:hover { background: var(--border); }
 
+  /* Wizard button */
+  .wizard-btn {
+    background: transparent;
+    border: 1px solid #8b5cf6;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.35);
+    font-family: inherit;
+    padding: 0;
+    line-height: 1;
+  }
+  .wizard-btn:hover {
+    transform: scale(1.1) rotate(-8deg);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
+  }
+
+  /* Wizard modal */
+  .wizard-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 20, 0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .wizard-modal.open { display: flex; }
+  .wizard-card {
+    background: linear-gradient(135deg, #1a1230 0%, #141c2f 70%);
+    border: 1px solid #8b5cf6;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 780px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+  }
+  .wizard-card h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #c4b5fd;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .wizard-card .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .wizard-close {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .wizard-close:hover { background: var(--panel-2); color: var(--text); }
+  .wizard-card table { width: 100%; margin-top: 16px; font-size: 14px; border-collapse: collapse; }
+  .wizard-card th { text-align: right; padding: 10px; color: #c4b5fd; border-bottom: 1px solid #3b2a6b; font-size: 12px; text-transform: uppercase; }
+  .wizard-card td { padding: 10px; border-bottom: 1px solid rgba(139, 92, 246, 0.15); }
+  .wizard-card td.num { font-weight: 600; font-variant-numeric: tabular-nums; color: #c4b5fd; }
+  .wizard-card td.growth { color: #a78bfa; font-size: 12px; }
+  .wizard-disclaimer {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
   @media (max-width: 768px) {
     .grid { grid-template-columns: 1fr; }
     h1 { font-size: 20px; }
@@ -294,8 +383,23 @@
       <button class="tab" data-tab="tiktok">TikTok</button>
     </div>
     <span class="updated" id="updated"></span>
+    <button class="wizard-btn" id="wizard-btn" title="הקוסם מנבא את העתיד — לחץ לדאשבורד של עוד 5 שנים">🧙‍♂️</button>
   </div>
 </header>
+
+<!-- Wizard Modal -->
+<div class="wizard-modal" id="wizard-modal">
+  <div class="wizard-card">
+    <button class="wizard-close" id="wizard-close">×</button>
+    <h2>🧙‍♂️ דאשבורד העתיד — תחזית ל-5 שנים</h2>
+    <div class="subtitle" id="wizard-subtitle"></div>
+    <div id="wizard-body"></div>
+    <div class="wizard-disclaimer">
+      ✨ איך מחושב? הקוסם לוקח את קצב הגידול החודשי הממוצע (CAGR) מהחודשים שהזנת, ומגלגל קדימה עד דצמבר 2030.
+      <br>⚠️ זו הערכה, לא הבטחה. קצבי גידול אמיתיים משתנים — ככל שנזין עוד חודשים, התחזית תהיה מדויקת יותר.
+    </div>
+  </div>
+</div>
 
 <!-- Month Filter (applies to ALL tabs) -->
 <div class="filter-bar">
@@ -1083,6 +1187,124 @@ document.getElementById('btn-last-3').addEventListener('click', () => {
   state.selectedMonths = new Set(ALL_MONTH_KEYS.slice(-3));
   renderMonthChips();
   renderAll();
+});
+
+// ============================================================
+// 🧙‍♂️ WIZARD — 5-year projection
+// ============================================================
+function cagrRate(first, last, months) {
+  if (!first || first <= 0 || !last || last <= 0 || months <= 0) return 0;
+  return Math.pow(last / first, 1 / months) - 1;
+}
+function projectForward(first, last, monthsElapsed, monthsForward) {
+  // Cap monthly growth at ±15% to avoid absurd 5-year projections from small samples
+  const r = cagrRate(first, last, monthsElapsed);
+  const capped = Math.max(-0.15, Math.min(0.15, r));
+  return last * Math.pow(1 + capped, monthsForward);
+}
+function growthPct(first, last, months) {
+  const r = cagrRate(first, last, months);
+  return (r * 100).toFixed(1) + '%';
+}
+
+function computeProjections() {
+  const tm = DATA.telemarketing;
+  // Use only monthly (non-quarterly) social data for projection baseline
+  const fb = DATA.facebook.filter(r => !/Q\d/.test(r.month_key));
+  const ig = DATA.instagram.filter(r => !/Q\d/.test(r.month_key));
+  const tt = DATA.tiktok.filter(r => !/Q\d/.test(r.month_key));
+
+  // TM baseline: first row is Dec 2025, next 3 are Jan-Mar 2026
+  const tmFirst = tm[0];
+  const tmLast = tm[tm.length - 1];
+  const tmMonths = tm.length - 1; // intervals
+  const tmForward = 60 - tmMonths; // Dec 2025 → Dec 2030 = 60 months
+
+  // Social baseline: Jan 2026 → Mar 2026 (2 intervals). But we still project to Dec 2030.
+  // Dec 2025 + 60 months = Dec 2030. Social started Jan 2026, so from Jan 2026 → Dec 2030 = 59 months.
+  const socFirst = { fb: fb[0], ig: ig[0], tt: tt[0] };
+  const socLast = { fb: fb[fb.length - 1], ig: ig[ig.length - 1], tt: tt[tt.length - 1] };
+  const socMonths = fb.length - 1;
+  const socForward = 59 - socMonths;
+
+  const projections = [];
+
+  // Telemarketing
+  projections.push({ group: '🎯 מוקד', rows: [
+    { label: 'עיסקאות חודשיות', current: tmLast.deals, projected: projectForward(tmFirst.deals, tmLast.deals, tmMonths, tmForward), growth: growthPct(tmFirst.deals, tmLast.deals, tmMonths), isMoney: true },
+    { label: 'סליקות חודשיות', current: tmLast.billings, projected: projectForward(tmFirst.billings, tmLast.billings, tmMonths, tmForward), growth: growthPct(tmFirst.billings, tmLast.billings, tmMonths), isMoney: true },
+    { label: 'עמלת פרנדוס חודשית', current: tmLast.prandos_commission, projected: projectForward(tmFirst.prandos_commission, tmLast.prandos_commission, tmMonths, tmForward), growth: growthPct(tmFirst.prandos_commission, tmLast.prandos_commission, tmMonths), isMoney: true },
+    { label: 'הכנסות קמפיינים מתמשכים', current: tmLast.campaign_revenue, projected: projectForward(tmFirst.campaign_revenue || 1, tmLast.campaign_revenue, tmMonths, tmForward), growth: growthPct(tmFirst.campaign_revenue || 1, tmLast.campaign_revenue, tmMonths), isMoney: true },
+  ]});
+
+  // Facebook
+  projections.push({ group: '📘 Facebook', rows: [
+    { label: 'Views חודשי', current: socLast.fb.views, projected: projectForward(socFirst.fb.views, socLast.fb.views, socMonths, socForward), growth: growthPct(socFirst.fb.views, socLast.fb.views, socMonths) },
+    { label: 'Content Interactions', current: socLast.fb.content_interactions, projected: projectForward(socFirst.fb.content_interactions, socLast.fb.content_interactions, socMonths, socForward), growth: growthPct(socFirst.fb.content_interactions, socLast.fb.content_interactions, socMonths) },
+    { label: 'סה"כ עוקבים', current: socLast.fb.total_followers, projected: projectForward(socFirst.fb.total_followers, socLast.fb.total_followers, socMonths, socForward), growth: growthPct(socFirst.fb.total_followers, socLast.fb.total_followers, socMonths) },
+  ]});
+
+  // Instagram
+  projections.push({ group: '📸 Instagram', rows: [
+    { label: 'Views חודשי', current: socLast.ig.views, projected: projectForward(socFirst.ig.views, socLast.ig.views, socMonths, socForward), growth: growthPct(socFirst.ig.views, socLast.ig.views, socMonths) },
+    { label: 'Reach חודשי', current: socLast.ig.reach, projected: projectForward(socFirst.ig.reach, socLast.ig.reach, socMonths, socForward), growth: growthPct(socFirst.ig.reach, socLast.ig.reach, socMonths) },
+    { label: 'סה"כ עוקבים', current: socLast.ig.followers, projected: projectForward(socFirst.ig.followers, socLast.ig.followers, socMonths, socForward), growth: growthPct(socFirst.ig.followers, socLast.ig.followers, socMonths) },
+  ]});
+
+  // TikTok
+  projections.push({ group: '🎵 TikTok', rows: [
+    { label: 'Video Views חודשי', current: socLast.tt.video_views, projected: projectForward(socFirst.tt.video_views, socLast.tt.video_views, socMonths, socForward), growth: growthPct(socFirst.tt.video_views, socLast.tt.video_views, socMonths) },
+    { label: 'Likes חודשי', current: socLast.tt.likes, projected: projectForward(socFirst.tt.likes, socLast.tt.likes, socMonths, socForward), growth: growthPct(socFirst.tt.likes, socLast.tt.likes, socMonths) },
+    { label: 'סה"כ עוקבים', current: socLast.tt.total_followers, projected: projectForward(socFirst.tt.total_followers, socLast.tt.total_followers, socMonths, socForward), growth: growthPct(socFirst.tt.total_followers, socLast.tt.total_followers, socMonths) },
+  ]});
+
+  return projections;
+}
+
+function renderWizard() {
+  const projs = computeProjections();
+  const tmFirst = DATA.telemarketing[0];
+  const tmLast = DATA.telemarketing[DATA.telemarketing.length - 1];
+  document.getElementById('wizard-subtitle').textContent =
+    `מבוסס על נתוני ${tmFirst.month_label} עד ${tmLast.month_label} — מקרין קדימה לדצמבר 2030 (5 שנים מתחילת המדידה)`;
+
+  const body = document.getElementById('wizard-body');
+  body.innerHTML = projs.map(group => `
+    <div style="margin-top:14px;">
+      <div style="font-weight:600;font-size:15px;color:#c4b5fd;margin-bottom:6px;">${group.group}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>מדד</th>
+            <th>היום</th>
+            <th>דצמבר 2030</th>
+            <th>קצב צמיחה חודשי</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${group.rows.map(r => `
+            <tr>
+              <td>${r.label}</td>
+              <td class="num">${r.isMoney ? fmtCurrency(r.current) : fmt(r.current)}</td>
+              <td class="num">✨ ${r.isMoney ? fmtCurrency(r.projected) : fmt(r.projected)}</td>
+              <td class="growth">${r.growth}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `).join('');
+}
+
+document.getElementById('wizard-btn').addEventListener('click', () => {
+  renderWizard();
+  document.getElementById('wizard-modal').classList.add('open');
+});
+document.getElementById('wizard-close').addEventListener('click', () => {
+  document.getElementById('wizard-modal').classList.remove('open');
+});
+document.getElementById('wizard-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'wizard-modal') e.currentTarget.classList.remove('open');
 });
 
 // ============================================================
