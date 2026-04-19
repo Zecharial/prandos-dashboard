@@ -308,6 +308,9 @@
 
 <!-- OVERVIEW TAB -->
 <div class="tab-content active" data-tab="overview">
+  <div class="section-title">סיכום תקופה נבחרת <span id="period-range" style="font-size:13px;color:var(--muted);font-weight:400;margin-right:8px;"></span></div>
+  <div class="cards" id="totals-cards"></div>
+
   <div class="section-title">KPIs מרכזיים (חודש אחרון)</div>
   <div class="cards" id="overview-cards"></div>
 
@@ -592,11 +595,48 @@ const BAR_OPTS = {
 // ============================================================
 // RENDER OVERVIEW
 // ============================================================
+function sum(arr, key) { return arr.reduce((a, r) => a + (Number(r[key]) || 0), 0); }
+
+function renderTotals(tm, fb, ig, tt) {
+  const totalsEl = document.getElementById('totals-cards');
+  if (!totalsEl) return;
+  totalsEl.innerHTML = '';
+
+  // Period range label
+  const rangeEl = document.getElementById('period-range');
+  if (rangeEl) {
+    const n = tm.length;
+    if (n === 0) rangeEl.textContent = '(אין חודשים נבחרים)';
+    else if (n === 1) rangeEl.textContent = `— ${tm[0].month_label}`;
+    else rangeEl.textContent = `— ${tm[0].month_label} עד ${tm[n-1].month_label} (${n} חודשים)`;
+  }
+  if (tm.length === 0) return;
+
+  const totalDeals = sum(tm, 'deals');
+  const totalBillings = sum(tm, 'billings');
+  const totalExpenses = sum(tm, 'total_expenses');
+  const totalCommission = sum(tm, 'prandos_commission');
+  const totalCampaign = sum(tm, 'campaign_revenue');
+  const fbViews = sum(fb, 'views');
+  const igViews = sum(ig, 'views');
+  const ttViews = sum(tt, 'video_views');
+  const totalInteractions = sum(fb, 'content_interactions') + sum(ig, 'content_interactions') + sum(tt, 'likes') + sum(tt, 'comments');
+
+  card(totalsEl, 'סה"כ עיסקאות', fmtCurrency(totalDeals), null, 'tm');
+  card(totalsEl, 'סה"כ סליקות', fmtCurrency(totalBillings), null, 'tm');
+  card(totalsEl, 'סה"כ הוצאות מוקד', fmtCurrency(totalExpenses), null, 'tm');
+  card(totalsEl, 'סה"כ עמלות פרנדוס', fmtCurrency(totalCommission), null, 'tm');
+  card(totalsEl, 'סה"כ הכנסות קמפיינים', fmtCurrency(totalCampaign), null, 'tm');
+  card(totalsEl, 'סה"כ Views (סושיאל)', fmt(fbViews + igViews + ttViews), null, 'fb');
+  card(totalsEl, 'סה"כ אינטראקציות', fmt(totalInteractions), null, 'ig');
+}
+
 function renderOverview() {
   const tm = filterTM();
   const fb = filterSocial('facebook');
   const ig = filterSocial('instagram');
   const tt = filterSocial('tiktok');
+  renderTotals(tm, fb, ig, tt);
   const last = tm[tm.length - 1];
   const prev = tm[tm.length - 2];
   const fbLast = fb[fb.length - 1], fbPrev = fb[fb.length - 2];
