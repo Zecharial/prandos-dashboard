@@ -817,15 +817,19 @@ function renderTelemarketing() {
 // ============================================================
 function renderFacebook() {
   const fb = filterSocial('facebook');
-  const last = fb[fb.length - 1], prev = fb[fb.length - 2];
   const cards = document.getElementById('fb-cards');
   cards.innerHTML = '';
-  card(cards, 'Views', fmt(last.views), delta(last.views, prev?.views), 'fb');
-  card(cards, 'Content Interactions', fmt(last.content_interactions), delta(last.content_interactions, prev?.content_interactions), 'fb');
-  card(cards, 'Visits', fmt(last.visits), delta(last.visits, prev?.visits), 'fb');
-  card(cards, 'עוקבים חדשים', fmt(last.new_follows), delta(last.new_follows, prev?.new_follows), 'fb');
-  card(cards, 'סה"כ עוקבים', fmt(last.total_followers), delta(last.total_followers, prev?.total_followers), 'fb');
-  card(cards, 'Viewers ייחודיים', fmt(last.viewers), delta(last.viewers, prev?.viewers), 'fb');
+  if (fb.length === 0) return;
+  const last = fb[fb.length - 1];  // for cumulative metrics (total followers)
+  const n = fb.length;
+  card(cards, `סה"כ Views (${n} חודשים)`, fmt(sum(fb, 'views')), null, 'fb');
+  card(cards, 'סה"כ Content Interactions', fmt(sum(fb, 'content_interactions')), null, 'fb');
+  card(cards, 'סה"כ Visits', fmt(sum(fb, 'visits')), null, 'fb');
+  card(cards, 'סה"כ עוקבים חדשים', fmt(sum(fb, 'new_follows')), null, 'fb');
+  card(cards, 'עוקבים (סוף תקופה)', fmt(last.total_followers), null, 'fb');
+  card(cards, 'סה"כ Views אורגני', fmt(sum(fb, 'views_organic')), null, 'fb');
+  card(cards, 'סה"כ Views ממומן', fmt(sum(fb, 'views_ads')), null, 'fb');
+  card(cards, 'סה"כ Viewers', fmt(sum(fb, 'viewers')), null, 'fb');
 
   getChart('chart-fb-organic-ads', {
     type: 'bar',
@@ -887,15 +891,19 @@ function renderFacebook() {
 // ============================================================
 function renderInstagram() {
   const ig = filterSocial('instagram');
-  const last = ig[ig.length - 1], prev = ig[ig.length - 2];
   const cards = document.getElementById('ig-cards');
   cards.innerHTML = '';
-  card(cards, 'Views', fmt(last.views), delta(last.views, prev?.views), 'ig');
-  card(cards, 'Reach', fmt(last.reach), delta(last.reach, prev?.reach), 'ig');
-  card(cards, 'Content Interactions', fmt(last.content_interactions), delta(last.content_interactions, prev?.content_interactions), 'ig');
-  card(cards, 'עוקבים', fmt(last.followers), delta(last.followers, prev?.followers), 'ig');
-  card(cards, 'גידול נטו', fmt(last.growth), delta(last.growth, prev?.growth), 'ig');
-  card(cards, 'Accounts Reached', fmt(last.accounts_reached), delta(last.accounts_reached, prev?.accounts_reached), 'ig');
+  if (ig.length === 0) return;
+  const last = ig[ig.length - 1];
+  const n = ig.length;
+  card(cards, `סה"כ Views (${n} חודשים)`, fmt(sum(ig, 'views')), null, 'ig');
+  card(cards, 'סה"כ Reach', fmt(sum(ig, 'reach')), null, 'ig');
+  card(cards, 'סה"כ Content Interactions', fmt(sum(ig, 'content_interactions')), null, 'ig');
+  card(cards, 'עוקבים (סוף תקופה)', fmt(last.followers), null, 'ig');
+  card(cards, 'סה"כ גידול נטו', fmt(sum(ig, 'growth')), null, 'ig');
+  card(cards, 'סה"כ Follows', fmt(sum(ig, 'follows')), null, 'ig');
+  card(cards, 'סה"כ Unfollows', fmt(sum(ig, 'unfollows')), null, 'ig');
+  card(cards, 'סה"כ Accounts Reached', fmt(sum(ig, 'accounts_reached')), null, 'ig');
 
   getChart('chart-ig-organic-ads', {
     type: 'bar',
@@ -962,15 +970,18 @@ function renderInstagram() {
 // ============================================================
 function renderTiktok() {
   const tt = filterSocial('tiktok');
-  const last = tt[tt.length - 1], prev = tt[tt.length - 2];
   const cards = document.getElementById('tt-cards');
   cards.innerHTML = '';
-  card(cards, 'Video Views', fmt(last.video_views), delta(last.video_views, prev?.video_views), 'tt');
-  card(cards, 'Profile Views', fmt(last.profile_views), delta(last.profile_views, prev?.profile_views), 'tt');
-  card(cards, 'Likes', fmt(last.likes), delta(last.likes, prev?.likes), 'tt');
-  card(cards, 'Shares', fmt(last.shares), delta(last.shares, prev?.shares), 'tt');
-  card(cards, 'גידול נטו', fmt(last.net_follows), delta(last.net_follows, prev?.net_follows), 'tt');
-  card(cards, 'סה"כ עוקבים', fmt(last.total_followers), delta(last.total_followers, prev?.total_followers), 'tt');
+  if (tt.length === 0) return;
+  const last = tt[tt.length - 1];
+  const n = tt.length;
+  card(cards, `סה"כ Video Views (${n} חודשים)`, fmt(sum(tt, 'video_views')), null, 'tt');
+  card(cards, 'סה"כ Profile Views', fmt(sum(tt, 'profile_views')), null, 'tt');
+  card(cards, 'סה"כ Likes', fmt(sum(tt, 'likes')), null, 'tt');
+  card(cards, 'סה"כ Comments', fmt(sum(tt, 'comments')), null, 'tt');
+  card(cards, 'סה"כ Shares', fmt(sum(tt, 'shares')), null, 'tt');
+  card(cards, 'סה"כ גידול נטו עוקבים', fmt(sum(tt, 'net_follows')), null, 'tt');
+  card(cards, 'עוקבים (סוף תקופה)', fmt(last.total_followers), null, 'tt');
 
   getChart('chart-tt-views', {
     type: 'line',
@@ -1034,6 +1045,8 @@ document.querySelectorAll('.tab').forEach(btn => {
     const target = btn.dataset.tab;
     document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.tab === target));
+    // Trigger chart resize so canvases painted-while-hidden render correctly
+    requestAnimationFrame(() => Object.values(charts).forEach(c => c.resize()));
   });
 });
 
