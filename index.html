@@ -720,16 +720,29 @@ function renderOverview() {
 // ============================================================
 function renderTelemarketing() {
   const tm = filterTM();
-  const last = tm[tm.length - 1];
-  const prev = tm[tm.length - 2];
   const cards = document.getElementById('tm-cards');
   cards.innerHTML = '';
-  card(cards, 'עיסקאות', fmtCurrency(last.deals), delta(last.deals, prev?.deals), 'tm');
-  card(cards, 'סליקות', fmtCurrency(last.billings), delta(last.billings, prev?.billings), 'tm');
-  card(cards, 'יעד', fmtPct(last.target_pct), delta(last.target_pct, prev?.target_pct), 'tm');
-  card(cards, 'הוצאות מוקד', fmtCurrency(last.total_expenses), delta(last.total_expenses, prev?.total_expenses), 'tm');
-  card(cards, 'עמלות לנציגים', fmtCurrency(last.commissions), delta(last.commissions, prev?.commissions), 'tm');
-  card(cards, 'עמלת פרנדוס', fmtCurrency(last.prandos_commission), delta(last.prandos_commission, prev?.prandos_commission), 'tm');
+  if (tm.length === 0) return;
+
+  const totalDeals = sum(tm, 'deals');
+  const totalBillings = sum(tm, 'billings');
+  const totalExpenses = sum(tm, 'total_expenses');
+  const totalCommissions = sum(tm, 'commissions');
+  const totalPrandos = sum(tm, 'prandos_commission');
+  const totalAgentHours = sum(tm, 'agent_hours');
+  const totalManagerHours = sum(tm, 'manager_hours');
+  // Average target %, skipping months without a target
+  const targetRows = tm.filter(r => r.target_pct !== null && r.target_pct !== undefined);
+  const avgTarget = targetRows.length ? targetRows.reduce((a, r) => a + r.target_pct, 0) / targetRows.length : null;
+
+  card(cards, `סה"כ עיסקאות (${tm.length} חודשים)`, fmtCurrency(totalDeals), null, 'tm');
+  card(cards, 'סה"כ סליקות', fmtCurrency(totalBillings), null, 'tm');
+  card(cards, 'ממוצע יעד', fmtPct(avgTarget), null, 'tm');
+  card(cards, 'סה"כ הוצאות מוקד', fmtCurrency(totalExpenses), null, 'tm');
+  card(cards, 'סה"כ עמלות לנציגים', fmtCurrency(totalCommissions), null, 'tm');
+  card(cards, 'סה"כ עמלות פרנדוס', fmtCurrency(totalPrandos), null, 'tm');
+  card(cards, 'סה"כ שעות נציגים', fmt(totalAgentHours), null, 'tm');
+  card(cards, 'סה"כ שעות מנהל', fmt(totalManagerHours), null, 'tm');
 
   getChart('chart-tm-deals', {
     type: 'bar',
