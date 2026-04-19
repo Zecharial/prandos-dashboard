@@ -67,6 +67,14 @@
   }
   .tab:hover { color: var(--text); }
   .tab.active { background: var(--accent); color: white; }
+  .tab-icon { padding: 8px 12px; display: inline-flex; align-items: center; justify-content: center; }
+  .tab-icon svg { display: block; }
+  .tab[data-tab="facebook"]:not(.active) { color: #1877f2; }
+  .tab[data-tab="instagram"]:not(.active) { color: #e1306c; }
+  .tab[data-tab="tiktok"]:not(.active) { color: #25f4ee; }
+  .tab[data-tab="facebook"].active { background: #1877f2; }
+  .tab[data-tab="instagram"].active { background: #e1306c; }
+  .tab[data-tab="tiktok"].active { background: #000; color: #25f4ee; border: 1px solid #25f4ee; }
   .updated {
     font-size: 12px;
     color: var(--muted);
@@ -378,9 +386,15 @@
       <button class="tab active" data-tab="overview">סקירה כללית</button>
       <button class="tab" data-tab="insights">תובנות</button>
       <button class="tab" data-tab="telemarketing">מוקד</button>
-      <button class="tab" data-tab="facebook">Facebook</button>
-      <button class="tab" data-tab="instagram">Instagram</button>
-      <button class="tab" data-tab="tiktok">TikTok</button>
+      <button class="tab tab-icon" data-tab="facebook" title="Facebook" aria-label="Facebook">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95 0-5.52-4.48-10-10-10z"/></svg>
+      </button>
+      <button class="tab tab-icon" data-tab="instagram" title="Instagram" aria-label="Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.849.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.849.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </button>
+      <button class="tab tab-icon" data-tab="tiktok" title="TikTok" aria-label="TikTok">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005.8 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1.84-.1z"/></svg>
+      </button>
     </div>
     <span class="updated" id="updated"></span>
     <button class="wizard-btn" id="wizard-btn" title="הקוסם מנבא את העתיד — לחץ לדאשבורד של עוד 5 שנים">🧙‍♂️</button>
