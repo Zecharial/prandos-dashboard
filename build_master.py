@@ -19,45 +19,64 @@ OUT_DIR = Path("/Users/zecharialandau/Zecharia-Cloude/the-system-v8/dashboard-pr
 telemarketing = [
     {
         "month_key": "2025-12", "month_label": "דצמבר 2025",
-        "deals": 37021, "billings": 27196, "target_pct": None,
+        "deals": 37021, "billings": 27196,
+        "target_pct": 0.8776, "target_deals_pct": None, "target_billings_pct": None,
         "agent_hours": 91.7, "agent_cost": 7794.5,
         "manager_hours": 117.7, "manager_cost": 15654.1,
         "commissions": 5553.15, "total_expenses": 29001.75,
-        "campaign_revenue": 40278,  # 35378+1332+180+1556+180+1352 (Hanukkah+Gdolim variants, excluding Kaplan one-time)
+        "campaign_revenue": 40278,
         "prandos_commission": 10298.64,
         "prandos_commission_base": 85822,
+        "pay_peach_current": 26284, "pay_peach_recurring": 26284,
+        "pay_cardcom": 50, "pay_paybox": 612, "pay_bank": 250, "pay_jgive": 0,
     },
     {
         "month_key": "2026-01", "month_label": "ינואר 2026",
-        "deals": 169413.5, "billings": 108274.5, "target_pct": 0.996,
+        "deals": 169413, "billings": 112603,
+        "target_pct": 0.996, "target_deals_pct": 1.0912, "target_billings_pct": 8.7032,
         "agent_hours": 369.74, "agent_cost": 31427.9,
         "manager_hours": 137.1, "manager_cost": 18234.3,
         "commissions": 25412, "total_expenses": 75074.2,
         "campaign_revenue": 3577,
         "prandos_commission": 13422.18,
         "prandos_commission_base": 111851.5,
+        "pay_peach_current": 82721, "pay_peach_recurring": 87050,
+        "pay_cardcom": 1576, "pay_paybox": 12900, "pay_bank": 11077, "pay_jgive": 0,
     },
     {
         "month_key": "2026-02", "month_label": "פברואר 2026",
-        "deals": 132005, "billings": 81920, "target_pct": 0.5973,
+        "deals": 132005, "billings": 93182,
+        "target_pct": 0.5963, "target_deals_pct": 0.85027, "target_billings_pct": 3.6012,
         "agent_hours": 480.18, "agent_cost": 40815.3,
         "manager_hours": 181.43, "manager_cost": 21000,
         "commissions": 19800, "total_expenses": 81615.3,
         "campaign_revenue": 17383,
         "prandos_commission": 11916,
         "prandos_commission_base": 99303,
+        "pay_peach_current": 80487, "pay_peach_recurring": 83403,
+        "pay_cardcom": 3054, "pay_paybox": 3855, "pay_bank": 2870, "pay_jgive": 0,
     },
     {
         "month_key": "2026-03", "month_label": "מרץ 2026",
-        "deals": 129767, "billings": 103759, "target_pct": 0.8171,
+        "deals": 129767, "billings": 121541,
+        "target_pct": 0.8171, "target_deals_pct": 0.8358, "target_billings_pct": 3.1314,
         "agent_hours": 345.24, "agent_cost": 29345.4,
         "manager_hours": 172.48, "manager_cost": 21000,
         "commissions": 19465.05, "total_expenses": 69810.45,
-        "campaign_revenue": 29794,  # 17383 recurring + 12411 net campaign revenue
+        "campaign_revenue": 29794,
         "prandos_commission": 16026.36,
         "prandos_commission_base": 133553,
+        "pay_peach_current": 81137, "pay_peach_recurring": 98919,
+        "pay_cardcom": 9474, "pay_paybox": 6238, "pay_bank": 6160, "pay_jgive": 750,
     },
 ]
+
+# Cumulative since opening (from new master file)
+cumulative = {
+    "total_deals_since_opening": 468206,
+    "total_billings_since_opening": 354522,
+    "soldiers_adopted": 56,
+}
 
 # Social: Facebook, Instagram, TikTok
 social_facebook = [
@@ -274,7 +293,8 @@ data_for_js = {
     "facebook": social_facebook,
     "instagram": social_instagram,
     "tiktok": social_tiktok,
-    "last_updated": "2026-04-19",
+    "cumulative": cumulative,
+    "last_updated": "2026-04-20",
 }
 (OUT_DIR / "data.json").write_text(json.dumps(data_for_js, ensure_ascii=False, indent=2), encoding="utf-8")
 
