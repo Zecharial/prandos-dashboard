@@ -135,6 +135,8 @@
   .card.ig::before { background: var(--ig); }
   .card.tt::before { background: var(--tt); }
   .card.tm::before { background: var(--tm); }
+  .card.profit::before { background: var(--good); }
+  .card.profit .value { color: var(--good); }
   .card .label {
     font-size: 12px;
     color: var(--muted);
@@ -484,6 +486,16 @@
   <div style="text-align: center;">
     <div style="font-size: 22px; font-weight: 700; color: var(--text);" id="cum-billings">—</div>
     <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">סה"כ סליקות</div>
+  </div>
+  <div style="width: 1px; height: 40px; background: var(--border);"></div>
+  <div style="text-align: center;" title="סליקות (מזומן שנכנס בפועל) − הוצאות מוקד − עמלת פרנדוס">
+    <div style="font-size: 22px; font-weight: 700; color: var(--good);" id="cum-profit">—</div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">רווח מצטבר — מסליקות</div>
+  </div>
+  <div style="width: 1px; height: 40px; background: var(--border);"></div>
+  <div style="text-align: center;" title="עסקאות (חד-פעמי + שווי מלא של הוראות קבע) − הוצאות מוקד − עמלת פרנדוס">
+    <div style="font-size: 22px; font-weight: 700; color: var(--good);" id="cum-profit-deals">—</div>
+    <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">רווח מצטבר — מעסקאות</div>
   </div>
 </div>
 
@@ -845,6 +857,8 @@ function renderTotals(tm, fb, ig, tt) {
   const totalBillings = sum(tm, 'billings');
   const totalExpenses = sum(tm, 'total_expenses');
   const totalCommission = sum(tm, 'prandos_commission');
+  const totalProfitBillings = totalBillings - totalExpenses - totalCommission;
+  const totalProfitDeals = totalDeals - totalExpenses - totalCommission;
   const fbViews = sum(fb, 'views');
   const igViews = sum(ig, 'views');
   const ttViews = sum(tt, 'video_views');
@@ -857,6 +871,8 @@ function renderTotals(tm, fb, ig, tt) {
   card(totalsEl, 'סה"כ סליקות מוקד', fmtCurrency(totalBillings), null, 'tm');
   card(totalsEl, 'סה"כ הוצאות מוקד', fmtCurrency(totalExpenses), null, 'tm');
   card(totalsEl, 'סה"כ עמלות פרנדוס', fmtCurrency(totalCommission), null, 'tm');
+  card(totalsEl, 'רווח עמותה — מסליקות (מזומן)', fmtCurrency(totalProfitBillings), null, 'profit');
+  card(totalsEl, 'רווח עמותה — מעסקאות (כולל עתידי)', fmtCurrency(totalProfitDeals), null, 'profit');
 
   // Social — split per network
   card(totalsEl, 'Facebook — Views', fmt(fbViews), null, 'fb');
@@ -1723,6 +1739,10 @@ document.getElementById('footer-date').textContent = DATA.last_updated;
   const totalDeals = DATA.telemarketing.reduce((a, r) => a + (Number(r.deals) || 0), 0);
   const totalCampaigns = (DATA.campaigns || []).reduce((a, c) => a + (Number(c.revenue) || 0), 0);
   const totalBillings = DATA.telemarketing.reduce((a, r) => a + (Number(r.billings) || 0), 0);
+  const totalExpenses = DATA.telemarketing.reduce((a, r) => a + (Number(r.total_expenses) || 0), 0);
+  const totalCommission = DATA.telemarketing.reduce((a, r) => a + (Number(r.prandos_commission) || 0), 0);
+  const totalProfitBillings = totalBillings - totalExpenses - totalCommission;
+  const totalProfitDeals = totalDeals - totalExpenses - totalCommission;
   const totalForSoldiers = totalDeals + totalCampaigns;
   const soldiers = Math.round(totalForSoldiers / 10000);
 
@@ -1732,6 +1752,12 @@ document.getElementById('footer-date').textContent = DATA.last_updated;
   document.getElementById('cum-deals').textContent = fmtCurrency(totalDeals);
   document.getElementById('cum-campaigns').textContent = fmtCurrency(totalCampaigns);
   document.getElementById('cum-billings').textContent = fmtCurrency(totalBillings);
+  const cumProfitEl = document.getElementById('cum-profit');
+  cumProfitEl.textContent = fmtCurrency(totalProfitBillings);
+  cumProfitEl.style.color = totalProfitBillings >= 0 ? 'var(--good)' : 'var(--bad)';
+  const cumProfitDealsEl = document.getElementById('cum-profit-deals');
+  cumProfitDealsEl.textContent = fmtCurrency(totalProfitDeals);
+  cumProfitDealsEl.style.color = totalProfitDeals >= 0 ? 'var(--good)' : 'var(--bad)';
 })();
 
 renderMonthChips();
