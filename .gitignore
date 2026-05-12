@@ -2,3 +2,10 @@ Master-Dashboard-Data.xlsx
 __pycache__/
 *.pyc
 .DS_Store
+
+# Local-only: raw monthly inputs (Excel / PPT / PDF) — never publish
+INPUTS/
+# Local-only: CSV mirror of data.json for inspection in Excel
+data/csv/
+# Local working notes
+README-mine.md
