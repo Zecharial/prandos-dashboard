@@ -186,6 +186,21 @@
       "views_ads": 3350386,
       "viewers": 1565644,
       "watch_time_days": 182.79
+    },
+    {
+      "month_key": "2026-04",
+      "month_label": "אפריל 2026",
+      "views": 3047048,
+      "views_3sec": 424300,
+      "views_1min": 2100,
+      "content_interactions": 36300,
+      "visits": 9100,
+      "new_follows": 481,
+      "total_followers": 31898,
+      "views_organic": 229398,
+      "views_ads": 2817650,
+      "viewers": 1026976,
+      "watch_time_days": 87.29
     }
   ],
   "instagram": [
@@ -244,6 +259,20 @@
       "follows": 454,
       "unfollows": 55,
       "accounts_reached": 615584
+    },
+    {
+      "month_key": "2026-04",
+      "month_label": "אפריל 2026",
+      "views": 1565052,
+      "reach": 710582,
+      "content_interactions": 85900,
+      "views_organic": 549507,
+      "views_ads": 1015545,
+      "followers": null,
+      "growth": null,
+      "follows": null,
+      "unfollows": null,
+      "accounts_reached": 710582
     }
   ],
   "tiktok": [
@@ -289,6 +318,17 @@
       "comments": 327,
       "shares": 746,
       "net_follows": 479,
+      "total_followers": 13000
+    },
+    {
+      "month_key": "2026-04",
+      "month_label": "אפריל 2026",
+      "video_views": 1900000,
+      "profile_views": 12500,
+      "likes": 41200,
+      "comments": 1000,
+      "shares": 6200,
+      "net_follows": 623,
       "total_followers": 13000
     }
   ],

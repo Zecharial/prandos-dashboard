@@ -127,6 +127,11 @@ social_facebook = [
      "content_interactions": 121500, "visits": 14400, "new_follows": 6000,
      "total_followers": 31541, "views_organic": 835962, "views_ads": 3350386,
      "viewers": 1565644, "watch_time_days": 182.79},
+    {"month_key": "2026-04", "month_label": "אפריל 2026",
+     "views": 3047048, "views_3sec": 424300, "views_1min": 2100,
+     "content_interactions": 36300, "visits": 9100, "new_follows": 481,
+     "total_followers": 31898, "views_organic": 229398, "views_ads": 2817650,
+     "viewers": 1026976, "watch_time_days": 87.29},
 ]
 
 social_instagram = [
@@ -150,6 +155,12 @@ social_instagram = [
      "views_organic": 193570, "views_ads": 1146097,
      "followers": 7669, "growth": 399, "follows": 454, "unfollows": 55,
      "accounts_reached": 615584},
+    {"month_key": "2026-04", "month_label": "אפריל 2026",
+     "views": 1565052, "reach": 710582, "content_interactions": 85900,
+     "views_organic": 549507, "views_ads": 1015545,
+     # Followers/Growth/Follows/Unfollows: PDF this month replaced this section with "Profile activity"; not available
+     "followers": None, "growth": None, "follows": None, "unfollows": None,
+     "accounts_reached": 710582},
 ]
 
 social_tiktok = [
@@ -169,6 +180,10 @@ social_tiktok = [
      "video_views": 1500000, "profile_views": 5300, "likes": 20000,
      "comments": 327, "shares": 746,
      "net_follows": 479, "total_followers": 13000},
+    {"month_key": "2026-04", "month_label": "אפריל 2026",
+     "video_views": 1900000, "profile_views": 12500, "likes": 41200,
+     "comments": 1000, "shares": 6200,
+     "net_follows": 623, "total_followers": 13000},
 ]
 
 # ============================================================
@@ -267,7 +282,7 @@ for i, tm in enumerate(telemarketing):
     fb_i = fb["content_interactions"] if fb else 0
     ig_i = ig["content_interactions"] if ig else 0
     tt_i = (tt["likes"] + tt["comments"]) if tt else 0
-    followers_total = (fb["total_followers"] if fb else 0) + (ig["followers"] if ig else 0) + (tt["total_followers"] if tt else 0)
+    followers_total = ((fb["total_followers"] if fb else 0) or 0) + ((ig["followers"] if ig else 0) or 0) + ((tt["total_followers"] if tt else 0) or 0)
     rows.append([tm["month_key"], tm["month_label"],
                  tm["deals"], tm["billings"], net_profit,
                  fb_v, ig_v, tt_v, fb_v + ig_v + tt_v,
